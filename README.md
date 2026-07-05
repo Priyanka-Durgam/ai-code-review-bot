@@ -124,3 +124,5 @@ lib/
   worth mentioning if asked about securing webhooks.
 - Large diffs are truncated before hitting the LLM — a real constraint you
   had to design around (token limits), not just an API call.
+
+<!-- test PR for AI review bot -->
