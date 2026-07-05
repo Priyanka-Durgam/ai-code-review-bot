@@ -1,33 +1,46 @@
 import styles from "./page.module.css";
 
+const LINKS = {
+  livePr: "https://github.com/Priyanka-Durgam/ai-code-review-bot/pull/1",
+  source: "https://github.com/Priyanka-Durgam/ai-code-review-bot",
+  webhook: "https://ai-code-review-bot-zeta.vercel.app/api/webhook",
+};
+
 export default function Home() {
   return (
     <main className={`${styles.page} fade-in`}>
       <div className={styles.badgeRow}>
         <span className={styles.badge}>
           <span className={styles.dot} />
-          LIVE
+          Live
         </span>
-        <span className={styles.prNumber}>#1 · opened by ai-review-bot</span>
+        <span className={styles.meta}>Next.js · Groq · Vercel</span>
       </div>
 
       <h1 className={styles.title}>AI Code Review Bot</h1>
       <p className={styles.subtitle}>
-        A GitHub bot that reviews pull requests automatically. On every PR open or
-        update, it fetches the diff, sends it to a fast free LLM (Groq), and posts
-        the review as a comment — <b>bugs, code quality, missing tests, and nitpicks</b>,
-        organized and specific.
+        GitHub webhook service that reviews pull requests with Groq LLM and posts
+        structured feedback on bugs, code quality, missing tests, and nitpicks.
       </p>
 
+      <div className={styles.links}>
+        <a className={styles.linkBtnPrimary} href={LINKS.livePr} target="_blank" rel="noreferrer">
+          View live PR review ↗
+        </a>
+        <a className={styles.linkBtn} href={LINKS.source} target="_blank" rel="noreferrer">
+          Source code ↗
+        </a>
+      </div>
+
       <div className={styles.section}>
-        <div className={styles.sectionLabel}>Files changed · core logic</div>
+        <div className={styles.sectionLabel}>Architecture</div>
 
         <div className={styles.diffBlock}>
           <div className={styles.diffHeader}>
             <span>lib/providers/GitProvider.js</span>
-            <span>abstract interface</span>
+            <span>interface</span>
           </div>
-          <div className={`${styles.diffLine} ${styles.neutral}`}>// any git host implements this contract</div>
+          <div className={`${styles.diffLine} ${styles.neutral}`}>// contract for any git host</div>
           <div className={`${styles.diffLine} ${styles.add}`}>+ getDiff(payload)</div>
           <div className={`${styles.diffLine} ${styles.add}`}>+ postReview(payload, reviewText)</div>
         </div>
@@ -38,7 +51,7 @@ export default function Home() {
             <span>implementation</span>
           </div>
           <div className={`${styles.diffLine} ${styles.add}`}>+ class GitHubProvider extends GitProvider</div>
-          <div className={`${styles.diffLine} ${styles.neutral}`}>  uses Octokit to fetch diffs & post comments</div>
+          <div className={`${styles.diffLine} ${styles.neutral}`}>  Octokit — fetch diffs, post comments</div>
         </div>
 
         <div className={styles.diffBlock}>
@@ -46,12 +59,14 @@ export default function Home() {
             <span>app/api/webhook/route.js</span>
             <span>orchestration</span>
           </div>
-          <div className={`${styles.diffLine} ${styles.neutral}`}>PR event → verify signature → getDiff → reviewDiff → postReview</div>
+          <div className={`${styles.diffLine} ${styles.neutral}`}>
+            PR event → verify signature → getDiff → reviewDiff → postReview
+          </div>
         </div>
       </div>
 
       <div className={styles.section}>
-        <div className={styles.sectionLabel}>Example output</div>
+        <div className={styles.sectionLabel}>Sample review output</div>
         <div className={styles.comment}>
           <h3>🤖 AI Code Review</h3>
           <p><strong>Bugs / correctness</strong></p>
@@ -60,77 +75,28 @@ export default function Home() {
           </ul>
           <p><strong>Code quality</strong></p>
           <ul>
-            <li>Consider extracting the retry logic into a shared helper — it's duplicated in two files.</li>
+            <li>Consider extracting the retry logic into a shared helper — duplicated in two files.</li>
           </ul>
           <p><strong>Missing tests</strong></p>
           <ul>
             <li>No test covers the empty-response case for the new API call.</li>
           </ul>
         </div>
+        <p className={styles.sampleNote}>
+          Illustrative example. See the{" "}
+          <a href={LINKS.livePr} target="_blank" rel="noreferrer">
+            live review on PR #1
+          </a>
+          .
+        </p>
       </div>
 
-      <div className={styles.section}>
-        <div className={styles.sectionLabel}>Setup checklist</div>
-        <ul className={styles.checklist}>
-          <li className={styles.checkItem}>
-            <span className={styles.checkIcon}>✓</span>
-            <div>
-              <div className={styles.checkTitle}>Get a free Groq API key</div>
-              <div className={styles.checkDesc}>
-                console.groq.com → create key → add as <code>GROQ_API_KEY</code>
-              </div>
-            </div>
-          </li>
-          <li className={styles.checkItem}>
-            <span className={styles.checkIcon}>✓</span>
-            <div>
-              <div className={styles.checkTitle}>Create a GitHub personal access token</div>
-              <div className={styles.checkDesc}>
-                repo scope → add as <code>GITHUB_TOKEN</code>
-              </div>
-            </div>
-          </li>
-          <li className={styles.checkItem}>
-            <span className={styles.checkIcon}>✓</span>
-            <div>
-              <div className={styles.checkTitle}>Deploy to Vercel</div>
-              <div className={styles.checkDesc}>connect this repo, add the env vars, deploy</div>
-            </div>
-          </li>
-          <li className={styles.checkItem}>
-            <span className={styles.checkIcon}>✓</span>
-            <div>
-              <div className={styles.checkTitle}>Add the webhook to your target repo</div>
-              <div className={styles.checkDesc}>
-                Settings → Webhooks → Payload URL: <code>your-app.vercel.app/api/webhook</code>, content type{" "}
-                <code>application/json</code>, secret matches <code>GITHUB_WEBHOOK_SECRET</code>, event:{" "}
-                <code>Pull requests</code>
-              </div>
-            </div>
-          </li>
-        </ul>
-      </div>
-
-      <div className={styles.links}>
-        <a
-          className={styles.linkBtn}
-          href="https://github.com/Priyanka-Durgam/ai-code-review-bot/pull/1"
-          target="_blank"
-          rel="noreferrer"
-        >
-          See live PR review ↗
-        </a>
-        <a
-          className={styles.linkBtn}
-          href="https://github.com/Priyanka-Durgam/ai-code-review-bot"
-          target="_blank"
-          rel="noreferrer"
-        >
-          View source ↗
+      <div className={styles.footer}>
+        <span>Webhook endpoint</span>
+        <a href={LINKS.webhook} target="_blank" rel="noreferrer">
+          /api/webhook
         </a>
       </div>
-
-      <div className={styles.footer}>Built with Next.js, Groq, and the GitHub API.</div>
     </main>
   );
 }
