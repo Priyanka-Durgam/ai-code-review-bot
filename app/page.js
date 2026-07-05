@@ -112,7 +112,20 @@ export default function Home() {
       </div>
 
       <div className={styles.links}>
-        <a className={styles.linkBtn} href="https://github.com/Priyanka-Durgam" target="_blank" rel="noreferrer">
+        <a
+          className={styles.linkBtn}
+          href="https://github.com/Priyanka-Durgam/ai-code-review-bot/pull/1"
+          target="_blank"
+          rel="noreferrer"
+        >
+          See live PR review ↗
+        </a>
+        <a
+          className={styles.linkBtn}
+          href="https://github.com/Priyanka-Durgam/ai-code-review-bot"
+          target="_blank"
+          rel="noreferrer"
+        >
           View source ↗
         </a>
       </div>

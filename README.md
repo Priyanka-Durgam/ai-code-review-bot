@@ -1,14 +1,23 @@
-# 🤖 AI Code Review Bot
+# AI Code Review Bot
 
-A GitHub bot that automatically reviews pull requests using AI. When a PR is
-opened or updated, the bot fetches the diff, sends it to a free/fast LLM
-(Groq), and posts a structured review comment covering bugs, code quality,
-missing tests, and nitpicks.
+A production-ready GitHub bot that automatically reviews pull requests using AI. When a PR is opened or updated, the bot fetches the diff, sends it to Groq (Llama 3.3), and posts a structured review comment — covering bugs, code quality, missing tests, and nitpicks.
 
-Built to be **provider-agnostic**: git hosting logic sits behind a
-`GitProvider` interface (`lib/providers/GitProvider.js`). Today only GitHub
-is implemented (`GitHubProvider.js`), but adding GitLab/Bitbucket later means
-writing one new adapter class — nothing else changes.
+**Live demo:** [ai-code-review-bot-zeta.vercel.app](https://ai-code-review-bot-zeta.vercel.app)  
+**Working example:** [PR #1 — live AI review comment](https://github.com/Priyanka-Durgam/ai-code-review-bot/pull/1)  
+**Source:** [github.com/Priyanka-Durgam/ai-code-review-bot](https://github.com/Priyanka-Durgam/ai-code-review-bot)
+
+---
+
+## Features
+
+- **Automated PR reviews** — triggers on PR open, update, or reopen
+- **Structured feedback** — bugs, code quality, missing tests, and nitpicks in markdown
+- **Secure webhooks** — HMAC-SHA256 signature verification before processing any payload
+- **Provider-agnostic design** — git hosting logic behind a `GitProvider` interface; GitHub implemented today, other hosts are a single adapter class away
+- **Large-diff handling** — truncates oversized diffs before sending to the LLM (token limit constraint)
+- **Serverless deployment** — runs on Vercel with zero server management
+
+---
 
 ## How it works
 
@@ -16,90 +25,49 @@ writing one new adapter class — nothing else changes.
 PR opened/updated on GitHub
         │
         ▼
-GitHub sends a webhook → /api/webhook
+GitHub sends webhook POST → /api/webhook
         │
         ▼
-Verify webhook signature (GITHUB_WEBHOOK_SECRET)
+Verify HMAC signature (GITHUB_WEBHOOK_SECRET)
         │
         ▼
-Fetch the PR diff (GitHub API via Octokit)
+Fetch PR diff via GitHub API (Octokit + GITHUB_TOKEN)
         │
         ▼
 Send diff to Groq LLM with a review prompt
         │
         ▼
-Post the AI's review as a PR comment (GitHub API)
+Post AI review as a PR comment
 ```
-
-## Tech stack
-
-- **Next.js** (App Router) — API route handles the webhook, also serves a landing page
-- **Groq API** — free, very fast LLM inference for generating the review
-- **Octokit** — GitHub's official SDK, used to fetch diffs and post comments
-- **Vercel** — free hosting, deploys straight from GitHub
 
 ---
 
-## 1. Local setup
+## Tech stack
 
-```bash
-cd AI_Project01
-npm install
-cp .env.example .env.local
-```
+| Layer | Technology |
+|-------|------------|
+| Framework | Next.js 13 (App Router) |
+| LLM | Groq API — `llama-3.3-70b-versatile` |
+| GitHub integration | Octokit (`@octokit/rest`) |
+| Hosting | Vercel (serverless) |
+| Language | Node.js / JavaScript |
 
-Fill in `.env.local`:
+---
 
-| Variable | Where to get it |
-|---|---|
-| `GROQ_API_KEY` | [console.groq.com](https://console.groq.com) → API Keys → Create key (free) |
-| `GITHUB_TOKEN` | [github.com/settings/tokens](https://github.com/settings/tokens) → Generate new token (classic) → check the `repo` scope |
-| `GITHUB_WEBHOOK_SECRET` | Make up any random string yourself, e.g. `openssl rand -hex 20` |
+## Demo (2-minute walkthrough)
 
-Run it locally:
+Use this flow when presenting the project in an interview or portfolio review.
 
-```bash
-npm run dev
-```
+1. **Show the landing page** — [ai-code-review-bot-zeta.vercel.app](https://ai-code-review-bot-zeta.vercel.app)  
+   Explains the architecture and example output at a glance.
 
-Visit `http://localhost:3000` — you should see the project landing page.
+2. **Show the live PR** — [Pull Request #1](https://github.com/Priyanka-Durgam/ai-code-review-bot/pull/1)  
+   Point to the **AI Code Review** comment posted automatically by the bot.
 
-## 2. Push to GitHub
+3. **Show the webhook is live** — [ai-code-review-bot-zeta.vercel.app/api/webhook](https://ai-code-review-bot-zeta.vercel.app/api/webhook)  
+   Returns `{"status":"AI Code Review Bot webhook is live."}`
 
-```bash
-git init
-git add .
-git commit -m "Initial commit: AI code review bot"
-git branch -M main
-git remote add origin https://github.com/Priyanka-Durgam/ai-code-review-bot.git
-git push -u origin main
-```
-
-(Create the empty repo first at github.com/new, name it `ai-code-review-bot`,
-**do not** initialize it with a README so the push above doesn't conflict.)
-
-## 3. Deploy to Vercel (free)
-
-1. Go to [vercel.com](https://vercel.com) → sign in with GitHub
-2. **Add New Project** → import `ai-code-review-bot`
-3. Under **Environment Variables**, add the same 3 variables from `.env.local`
-4. Deploy — you'll get a live URL like `https://ai-code-review-bot.vercel.app`
-
-## 4. Point a repo's webhook at your bot
-
-On any repo you want the bot to review (can be a test repo you make):
-
-1. Repo → **Settings → Webhooks → Add webhook**
-2. **Payload URL:** `https://ai-code-review-bot.vercel.app/api/webhook`
-3. **Content type:** `application/json`
-4. **Secret:** the same value as `GITHUB_WEBHOOK_SECRET`
-5. **Events:** select just **Pull requests**
-6. Save
-
-## 5. Test it
-
-Open a pull request on that repo (even a trivial one-line change). Within a
-few seconds you should see a comment from the bot with its review.
+4. **Optional live test** — open a new PR on any repo with the webhook configured; the bot comments within ~30 seconds.
 
 ---
 
@@ -116,11 +84,77 @@ lib/
     GitHubProvider.js         GitHub implementation (Octokit)
 ```
 
-## Notes for your resume / interviews
+---
 
-- Talk about the `GitProvider` abstraction — it's a clean example of
-  programming to an interface rather than a concrete implementation.
-- The webhook handler verifies HMAC signatures before trusting any payload —
-  worth mentioning if asked about securing webhooks.
-- Large diffs are truncated before hitting the LLM — a real constraint you
-  had to design around (token limits), not just an API call.
+## Setup
+
+### 1. Local development
+
+```bash
+git clone https://github.com/Priyanka-Durgam/ai-code-review-bot.git
+cd ai-code-review-bot
+npm install
+cp .env.example .env.local
+```
+
+Fill in `.env.local`:
+
+| Variable | Where to get it |
+|----------|-----------------|
+| `GROQ_API_KEY` | [console.groq.com](https://console.groq.com) → API Keys (free tier) |
+| `GITHUB_TOKEN` | [github.com/settings/tokens](https://github.com/settings/tokens) → classic token with `repo` scope |
+| `GITHUB_WEBHOOK_SECRET` | Any random string you create (must match the GitHub webhook secret) |
+
+```bash
+npm run dev
+```
+
+Visit `http://localhost:3000` (or the port shown in the terminal).
+
+### 2. Deploy to Vercel
+
+1. Sign in at [vercel.com](https://vercel.com) with GitHub
+2. **Add New Project** → import `ai-code-review-bot`
+3. Add the three environment variables from `.env.local`
+4. Deploy
+
+### 3. Configure the GitHub webhook
+
+On any repo you want the bot to review:
+
+1. **Settings → Webhooks → Add webhook**
+2. **Payload URL:** `https://ai-code-review-bot-zeta.vercel.app/api/webhook`
+3. **Content type:** `application/json`
+4. **Secret:** same value as `GITHUB_WEBHOOK_SECRET`
+5. **Events:** **Pull requests** only
+6. Save
+
+### 4. Test
+
+Open a pull request (even a one-line change). Within a few seconds, a **AI Code Review** comment should appear on the PR.
+
+---
+
+## Key design decisions
+
+**GitProvider abstraction** — Git hosting logic is behind an interface, not hard-coded to GitHub. Adding GitLab or Bitbucket means implementing one adapter class; the webhook handler and review logic stay unchanged.
+
+**Webhook security** — Every incoming request is verified with HMAC-SHA256 using a shared secret before any payload is trusted or processed.
+
+**Diff truncation** — Diffs longer than 12,000 characters are truncated before hitting the LLM, a real constraint driven by token limits on the free tier.
+
+---
+
+## Environment variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `GROQ_API_KEY` | Yes | Groq API key for LLM inference |
+| `GITHUB_TOKEN` | Yes | PAT with `repo` scope — fetch diffs and post comments |
+| `GITHUB_WEBHOOK_SECRET` | Yes | Shared secret for webhook signature verification |
+
+---
+
+## License
+
+MIT — use freely for learning, portfolios, and interviews.
