@@ -1,10 +1,12 @@
 # AI Code Review Bot
 
-A production-ready GitHub bot that automatically reviews pull requests using AI. When a PR is opened or updated, the bot fetches the diff, sends it to Groq (Llama 3.3), and posts a structured review comment — covering bugs, code quality, missing tests, and nitpicks.
+A GitHub bot that automatically reviews pull requests using AI. When a PR is opened or updated, the bot fetches the diff, sends it to Groq (Llama 3.3), and posts a structured review comment — covering bugs, code quality, missing tests, and nitpicks.
 
-**Live demo:** [ai-code-review-bot-zeta.vercel.app](https://ai-code-review-bot-zeta.vercel.app)  
-**Working example:** [PR #1 — live AI review comment](https://github.com/Priyanka-Durgam/ai-code-review-bot/pull/1)  
-**Source:** [github.com/Priyanka-Durgam/ai-code-review-bot](https://github.com/Priyanka-Durgam/ai-code-review-bot)
+| | |
+|---|---|
+| **Live app** | [ai-code-review-bot-zeta.vercel.app](https://ai-code-review-bot-zeta.vercel.app) |
+| **Sample output** | [PR #1](https://github.com/Priyanka-Durgam/ai-code-review-bot/pull/1) — bot-posted review comment |
+| **Webhook health** | [/api/webhook](https://ai-code-review-bot-zeta.vercel.app/api/webhook) |
 
 ---
 
@@ -51,23 +53,6 @@ Post AI review as a PR comment
 | GitHub integration | Octokit (`@octokit/rest`) |
 | Hosting | Vercel (serverless) |
 | Language | Node.js / JavaScript |
-
----
-
-## Demo (2-minute walkthrough)
-
-Use this flow when presenting the project in an interview or portfolio review.
-
-1. **Show the landing page** — [ai-code-review-bot-zeta.vercel.app](https://ai-code-review-bot-zeta.vercel.app)  
-   Explains the architecture and example output at a glance.
-
-2. **Show the live PR** — [Pull Request #1](https://github.com/Priyanka-Durgam/ai-code-review-bot/pull/1)  
-   Point to the **AI Code Review** comment posted automatically by the bot.
-
-3. **Show the webhook is live** — [ai-code-review-bot-zeta.vercel.app/api/webhook](https://ai-code-review-bot-zeta.vercel.app/api/webhook)  
-   Returns `{"status":"AI Code Review Bot webhook is live."}`
-
-4. **Optional live test** — open a new PR on any repo with the webhook configured; the bot comments within ~30 seconds.
 
 ---
 
@@ -157,4 +142,4 @@ Open a pull request (even a one-line change). Within a few seconds, a **AI Code 
 
 ## License
 
-MIT — use freely for learning, portfolios, and interviews.
+MIT
